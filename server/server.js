@@ -69,72 +69,64 @@
 // });
 
 
-
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const path = require('path');
 const linksRouter = require('./routes/links');
 const Link = require('./models/Link');
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || '*';
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 const app = express();
 
-// --- Middlewares ---
+// Configure CORS: allow specific origin(s) or all for now
+const clientOrigin = process.env.CLIENT_ORIGIN || '*'; // set CLIENT_ORIGIN to your Vercel URL later
+app.use(cors({ origin: clientOrigin }));
 app.use(express.json());
-app.use(
-  cors({
-    origin: CLIENT_ORIGIN,
-    methods: ["GET", "POST", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
 
-// --- Health Check ---
-app.get('/healthz', (req, res) => {
-  res.json({ ok: true, version: "1.0" });
-});
+// healthz
+app.get('/healthz', (req, res) => res.json({ ok: true, version: "1.0" }));
 
-// --- API Routes ---
+// API
 app.use('/api/links', linksRouter);
 
-// --- Redirection Route ---
+// redirect short link
 app.get('/:code', async (req, res) => {
   try {
     const { code } = req.params;
+    // protect against matching other routes (healthz / api handled above)
     const link = await Link.findOne({ code });
-
     if (!link) return res.status(404).send('Not found');
-
-    link.clicks += 1;
+    link.clicks = (link.clicks || 0) + 1;
     link.lastClicked = new Date();
     await link.save();
-
     return res.redirect(302, link.target);
   } catch (err) {
-    console.error("Redirect error:", err);
+    console.error(err);
     return res.status(500).send('Server error');
   }
 });
 
-// --- Start Server After Mongo Connect ---
-mongoose
-  .connect(MONGO_URI, {
-    serverSelectionTimeoutMS: 10000,
-  })
-  .then(() => {
-    console.log("MongoDB connected");
+// OPTIONAL: serve client static files if you build client into server/public
+if (process.env.SERVE_CLIENT === 'true') {
+  const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
+  app.use(express.static(clientBuildPath));
+  app.get('*', (req, res) => res.sendFile(path.join(clientBuildPath, 'index.html')));
+}
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
-  });
+// connect to mongo
+mongoose.connect(MONGO_URI, {
+  // let driver choose best TLS options; you can add options if needed
+  serverSelectionTimeoutMS: 10000,
+})
+.then(() => console.log("MongoDB connected successfully"))
+.catch(err => {
+  console.error("MongoDB connection error:", err);
+  process.exit(1); // exit so Render shows failure logs
+});
+
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
