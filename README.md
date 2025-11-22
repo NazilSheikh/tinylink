@@ -7,8 +7,7 @@
 
 ---
 
-## 📌 Live Demo  
-**Link:** https://tinylink-seven-theta.vercel.app/
+ 
  
 **API Health:** `/healthz` → should return `{ ok: true, version: "1.0" }`
 
