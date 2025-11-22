@@ -10,18 +10,25 @@
  
  
 **API Health:** `/healthz` → should return `{ ok: true, version: "1.0" }`
+---
+
+## 🎥 Link  
+📌 **Visit**  
+👉 *https://tinylink-olive.vercel.app/*
+
+---
 
 ---
 
 ## 🎥 Video Walkthrough  
 📌 **Demo + Code Explanation Video:**  
-👉 *soom*
+👉 * https://drive.google.com/file/d/1Fhl1D_FV9IJNofpen4w3-IAU4uViJ09E/view?usp=drivesdk*
 
 ---
 
 ## 🤖 AI Assistance  
 📌 **ChatGPT Transcript:**  
-👉 Add your transcript link here
+👉  *https://chatgpt.com/share/6920b46b-15e4-8002-a261-8b2eaf23f371*
 
 ---
 
@@ -82,7 +89,7 @@ tinylink/
 
 ### **Deployment**
 - **Frontend:** Vercel  
-- **Backend:** Render / Railway  
+- **Backend:** Render 
 - **Database:** MongoDB Atlas
 
 ---
