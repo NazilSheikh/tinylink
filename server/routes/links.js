@@ -27,7 +27,12 @@ router.post('/', async (req, res) => {
 
     const link = new Link({ code: finalCode, target });
     await link.save();
-    return res.status(201).json(link);
+    // return res.status(201).json(link);
+    return res.status(201).json({
+  ...link.toObject(),
+  shortUrl: `${process.env.BASE_URL}/${finalCode}`
+});
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'server error' });

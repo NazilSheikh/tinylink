@@ -84,8 +84,24 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 const app = express();
 
 // Configure CORS: allow specific origin(s) or all for now
-const clientOrigin = process.env.CLIENT_ORIGIN || '*'; // set CLIENT_ORIGIN to your Vercel URL later
+// const clientOrigin = process.env.CLIENT_ORIGIN || '*'; // set CLIENT_ORIGIN to your Vercel URL later
 app.use(cors({ origin: clientOrigin }));
+
+
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = [
+      "https://tinylink-olive.vercel.app",
+    ];
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS: Not allowed"));
+    }
+  }
+}));
+
+
 app.use(express.json());
 
 // healthz
