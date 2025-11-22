@@ -31,7 +31,8 @@
    
 
 
-const BASE = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+// const BASE = import.meta.env.VITE_BASE_URL || "http://localhost:5000";
+const BASE = import.meta.env.VITE_API_BASE || process.env.REACT_APP_BASE_URL;
 
 export async function listLinks() {
   const r = await fetch(`${BASE}/api/links`);
